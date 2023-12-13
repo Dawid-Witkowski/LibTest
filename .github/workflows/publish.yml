@@ -27,6 +27,9 @@ jobs:
 
       - name: Execute gradle build
         run: ./gradlew :components:build
+        env:
+          USER_TOKEN: ${{ secrets.USER_TOKEN }}
+          USER_ACTOR: ${{ secrets.USER_ACTOR }}
 
       - name: publish to Github Packages
         run: ./gradlew publish
