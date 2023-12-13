@@ -1,0 +1,41 @@
+def packageProperties = new Properties()
+packageProperties.load(new FileInputStream(rootProject.file("package.properties")))
+
+def localProperties = new Properties()
+if(rootProject.file("local.properties").exists()) {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+}
+
+android {
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId packageProperties['group.id']
+            artifactId project.name
+            version packageProperties['version.name']
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GithubPackages"
+            url = uri(packageProperties['url'])
+            credentials {
+                username = localProperties['github.username'] ?: System.getenv("GITHUB_ACTOR")
+                password = localProperties['github.token'] ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
